@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unchained</title>
+  <!-- Load Bootstrap4 CSS via django-bootstrap4 -->
+  {% load bootstrap5 %}
+  {% bootstrap_css %}
+</head>
+
+<body>
+
+  {% load bootstrap5 %}
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'myapp:index' %}">Unchained</a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        {% if request.user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'myapp:logout' %}">Logout</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'myapp:login' %}">Sign In</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'myapp:signup' %}">Sign Up</a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Content Block -->
+  <div class="container">
+    {% block content %}
+    <!-- Your page content goes here -->
+    {% endblock %}
+  </div>
+
+
+</body>
+
+</html>

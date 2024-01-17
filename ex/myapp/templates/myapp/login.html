@@ -1,0 +1,15 @@
+{% extends "myapp/base.html" %}
+
+{% load bootstrap5 %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="post" class="form-signin">
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

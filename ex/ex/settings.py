@@ -44,6 +44,7 @@ SESSION_NAMES = [
 # Application definition
 
 INSTALLED_APPS = [
+    "bootstrap5",
     "myapp.apps.MyappConfig",
     "django.contrib.admin",
     "django.contrib.auth",

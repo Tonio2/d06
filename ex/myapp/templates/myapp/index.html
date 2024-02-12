@@ -4,4 +4,45 @@
 
 {% block content %}
 <nav>Hello {{ uname }}!</nav>
+{% if request.user.is_authenticated %}
+<form method="post" class="my-4">
+  {% csrf_token %}
+  {% bootstrap_form_errors form type="non_fields" %}
+
+  {% bootstrap_field form.content label="Content" placeholder=form.content.label %}
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endif %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Author</th>
+      <th scope="col">Tip</th>
+      <th scope="col">Upvotes</th>
+      <th scope="col">Downvotes</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for tip in tips %}
+    <tr>
+      <th>{{ tip.date }}</th>
+      <th>{{ tip.author }}</th>
+      <th>{{ tip.content }}</th>
+      <th>{{ tip.upvotesCount }}</th>
+      <th>{{ tip.downvotesCount }}</th>
+      <th>
+        <form method="post" action="{% url 'myapp:update_tip' tip.id %}">
+          {% csrf_token %}
+          <button name="action" value="upvote" type="submit" class="btn btn-primary">Upvote</button>
+          <button name="action" value="downvote" type="submit" class="btn btn-primary">Downvote</button>
+          <button name="action" value="delete" type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

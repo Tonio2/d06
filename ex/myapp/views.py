@@ -6,11 +6,23 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 
-from .forms import SignUpForm, UserLoginForm
+from .models import Tip
+
+from .forms import SignUpForm, TipForm, UserLoginForm
 
 
 # Create your views here.
 def index(request):
+    if request.method == "POST":
+        form = TipForm(request.POST)
+        if form.is_valid():
+            tip = form.save(commit=False)
+            tip.author = request.user
+            tip.save()
+            return redirect("/")
+    else:
+        form = TipForm()
+
     current_time = datetime.datetime.now().timestamp()
     user_session = request.session.get("user", None)
 
@@ -25,7 +37,14 @@ def index(request):
     else:
         uname = user_session["name"]
 
-    return render(request, "myapp/index.html", {"uname": uname})
+    tips = Tip.objects.all()
+    for i in range(len(tips)):
+        tips[i].upvotesCount = len(tips[i].upvotes.all())
+        tips[i].downvotesCount = len(tips[i].downvotes.all())
+
+    return render(
+        request, "myapp/index.html", {"uname": uname, "tips": tips, "form": form}
+    )
 
 
 def user_login(request):
@@ -60,6 +79,39 @@ def signup(request):
         form = SignUpForm()
     return render(request, "myapp/signup.html", {"form": form})
 
+
 def user_logout(request):
     logout(request)
+    return redirect("/")
+
+
+def update_tip(request, pk):
+    if request.method != "POST":
+        return redirect("/")
+    if request.user.is_anonymous:
+        return redirect("/")
+    tip = Tip.objects.get(pk=pk)
+    action = request.POST.get("action")
+    if action == "delete":
+        tip.delete()
+    elif action == "upvote":
+        print("upvote")
+        if request.user in tip.upvotes.all():
+            print("already upvotes")
+            tip.upvotes.remove(request.user)
+        else:
+            if request.user in tip.downvotes.all():
+                print("already downvoted")
+                tip.downvotes.remove(request.user)
+            print("upvoting")
+            tip.upvotes.add(request.user)
+        tip.save()
+    elif action == "downvote":
+        if request.user in tip.downvotes.all():
+            tip.downvotes.remove(request.user)
+        else:
+            if request.user in tip.upvotes.all():
+                tip.upvotes.remove(request.user)
+            tip.downvotes.add(request.user)
+        tip.save()
     return redirect("/")

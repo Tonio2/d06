@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
+from .models import Tip
 
 
 class UserLoginForm(AuthenticationForm):
@@ -39,3 +40,9 @@ class SignUpForm(forms.ModelForm):
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError("Username already exists.")
         return username
+
+
+class TipForm(forms.ModelForm):
+    class Meta:
+        model = Tip
+        fields = ("content",)

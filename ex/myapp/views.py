@@ -3,10 +3,9 @@ import random
 from django.conf import settings
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 
-from .models import Tip
+from .models import Tip, CustomUser
 
 from .forms import SignUpForm, TipForm, UserLoginForm
 
@@ -88,30 +87,28 @@ def user_logout(request):
 def update_tip(request, pk):
     if request.method != "POST":
         return redirect("/")
-    if request.user.is_anonymous:
+    if not request.user.is_authenticated:
         return redirect("/")
-    tip = Tip.objects.get(pk=pk)
+    tip = get_object_or_404(Tip, pk=pk)
     action = request.POST.get("action")
     if action == "delete":
-        tip.delete()
+        if request.user == tip.author or request.user.has_perm("myapp.delete_tip"):
+            tip.delete()
     elif action == "upvote":
-        print("upvote")
         if request.user in tip.upvotes.all():
-            print("already upvotes")
             tip.upvotes.remove(request.user)
         else:
             if request.user in tip.downvotes.all():
-                print("already downvoted")
                 tip.downvotes.remove(request.user)
-            print("upvoting")
             tip.upvotes.add(request.user)
         tip.save()
     elif action == "downvote":
-        if request.user in tip.downvotes.all():
-            tip.downvotes.remove(request.user)
-        else:
-            if request.user in tip.upvotes.all():
-                tip.upvotes.remove(request.user)
-            tip.downvotes.add(request.user)
-        tip.save()
+        if request.user == tip.author or request.user.has_perm("myapp.can_downvote"):
+            if request.user in tip.downvotes.all():
+                tip.downvotes.remove(request.user)
+            else:
+                if request.user in tip.upvotes.all():
+                    tip.upvotes.remove(request.user)
+                tip.downvotes.add(request.user)
+            tip.save()
     return redirect("/")

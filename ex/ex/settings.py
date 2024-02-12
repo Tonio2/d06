@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = "myapp.CustomUser"
+
 SESSION_NAMES = [
     "session1",
     "session2",

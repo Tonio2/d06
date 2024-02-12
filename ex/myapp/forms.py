@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import User
+from .models import CustomUser
 from .models import Tip
 
 
@@ -22,7 +22,7 @@ class SignUpForm(forms.ModelForm):
     confirm_password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ("username", "password")
 
     def clean(self):
@@ -37,7 +37,7 @@ class SignUpForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.cleaned_data["username"]
-        if User.objects.filter(username=username).exists():
+        if CustomUser.objects.filter(username=username).exists():
             raise forms.ValidationError("Username already exists.")
         return username
 

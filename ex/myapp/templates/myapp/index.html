@@ -37,8 +37,12 @@
         <form method="post" action="{% url 'myapp:update_tip' tip.id %}">
           {% csrf_token %}
           <button name="action" value="upvote" type="submit" class="btn btn-primary">Upvote</button>
+          {% if perms.myapp.can_downvote or request.user == tip.author %}
           <button name="action" value="downvote" type="submit" class="btn btn-primary">Downvote</button>
+          {% endif %}
+          {% if perms.myapp.delete_tip or request.user == tip.author %}
           <button name="action" value="delete" type="submit" class="btn btn-danger">Delete</button>
+          {% endif %}
         </form>
       </th>
     </tr>

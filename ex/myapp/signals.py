@@ -1,6 +1,4 @@
 from django.dispatch import receiver, Signal
-from .models import CustomUser
-from django.shortcuts import get_object_or_404
 
 vote = Signal()
 

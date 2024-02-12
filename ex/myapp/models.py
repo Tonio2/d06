@@ -11,8 +11,6 @@ class CustomUser(AbstractUser):
         can_downvote_perm = Permission.objects.get(codename="can_downvote")
         can_delete_perm = Permission.objects.get(codename="delete_tip")
 
-        print(self.reputation)
-
         if self.reputation >= 15:
             self.user_permissions.add(can_downvote_perm)
         else:

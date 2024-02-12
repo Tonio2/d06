@@ -29,7 +29,7 @@
     {% for tip in tips %}
     <tr>
       <th>{{ tip.date }}</th>
-      <th>{{ tip.author }}</th>
+      <th>{{ tip.author }} ({% if tip.author.reputation >= 30 %}Expert{% elif tip.author.reputation >= 15 %}Amateur{% else %}Noob{% endif %})</th>
       <th>{{ tip.content }}</th>
       <th>{{ tip.upvotesCount }}</th>
       <th>{{ tip.downvotesCount }}</th>

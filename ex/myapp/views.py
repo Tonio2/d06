@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect
 from .models import Tip, CustomUser
 
 from .forms import SignUpForm, TipForm, UserLoginForm
+from .signals import vote
 
 
 # Create your views here.
@@ -97,18 +98,24 @@ def update_tip(request, pk):
     elif action == "upvote":
         if request.user in tip.upvotes.all():
             tip.upvotes.remove(request.user)
+            vote.send(Tip, bonus=-5, user=tip.author)
         else:
             if request.user in tip.downvotes.all():
                 tip.downvotes.remove(request.user)
+                vote.send(Tip, bonus=2, user=tip.author)
             tip.upvotes.add(request.user)
+            vote.send(Tip, bonus=5, user=tip.author)
         tip.save()
     elif action == "downvote":
         if request.user == tip.author or request.user.has_perm("myapp.can_downvote"):
             if request.user in tip.downvotes.all():
                 tip.downvotes.remove(request.user)
+                vote.send(Tip, bonus=2, user=tip.author)
             else:
                 if request.user in tip.upvotes.all():
                     tip.upvotes.remove(request.user)
+                    vote.send(Tip, bonus=-5, user=tip.author)
                 tip.downvotes.add(request.user)
+                vote.send(Tip, bonus=-2, user=tip.author)
             tip.save()
     return redirect("/")

@@ -4,8 +4,9 @@ from django.conf import settings
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 
-from .models import Tip, CustomUser
+from .models import Tip
 
 from .forms import SignUpForm, TipForm, UserLoginForm
 from .signals import vote
@@ -14,6 +15,8 @@ from .signals import vote
 # Create your views here.
 def index(request):
     if request.method == "POST":
+        if not request.user.is_authenticated:
+            return redirect(reverse("myapp:index"))
         form = TipForm(request.POST)
         if form.is_valid():
             tip = form.save(commit=False)
